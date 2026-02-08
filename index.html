@@ -41,42 +41,47 @@
             border: 2px solid #222; border-radius: 8px; color: white; outline: none;
         }
 
-        .btn { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-pink { background: var(--fnf-pink); color: white; }
+        .btn-pink:hover { background: #d61582; }
 
+        /* Card Setup */
         .song-card {
             background: var(--card);
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             border-left: 6px solid var(--fnf-pink);
             position: relative;
-            min-height: 120px;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Keeps content at bottom while icons stay top */
         }
 
-        /* FIXED ICON POSITIONING */
+        /* ICONS PINNED TOP-LEFT AFTER PINK BAR */
         .icon-container { 
             position: absolute;
-            top: 5px;   /* Small gap from the top border */
-            left: 10px; /* Small gap from the pink border */
+            top: 0;         /* Pinned to the very top edge */
+            left: 6px;      /* Starts right after the 6px pink border */
             display: flex;
-            align-items: center;
+            z-index: 10;
         } 
         
         .char-icon {
-            width: 80px; /* Adjusted size for better fit */
-            height: 80px;
-            object-fit: contain;
+            width: 150px; 
+            height: 75px;   /* Half height of typical 150px spritesheet */
+            object-fit: cover;
+            object-position: left; /* ONLY SHOWS THE LEFT ICON OF THE SHEET */
             image-rendering: pixelated;
-            margin-right: -20px; /* FNF style overlap */
+            margin-right: -40px;
         }
 
         .card-main { 
             display: flex; 
-            align-items: flex-end; /* Keeps rank/text below icons if they overlap */
+            align-items: center; 
             gap: 20px;
-            height: 100%;
-            margin-top: 40px; /* Pushes the rank/title down so icons have room */
+            margin-top: 45px; /* Creates room for the absolute icons above */
         }
 
         .rank-num { 
@@ -143,11 +148,12 @@
 </div>
 
 <script>
+    // DATA IS DIRECTLY HERE TO PREVENT FETCH BUGS
     const songData = [
         {
             "name": "Vindication",
             "download": "https://gamejolt.com/games/fridaynightdustinFULL/1012008",
-            "icon": ["vindication-sans", "vindication-sans"], // Array example
+            "icon": "vindication-sans",
             "verification": "" 
         }
     ];
