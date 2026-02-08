@@ -2,6 +2,11 @@
   {
     "name": "Vindication",
     "download": "https://gamejolt.com/games/fridaynightdustinFULL/1012008",
+    "icon": ["vindication-sans", "vindication-sans"]
+  },
+  {
+    "name": "Vindication TEST 2",
+    "download": "https://gamejolt.com/games/fridaynightdustinFULL/1012008",
     "icon": "vindication-sans"
   }
 ]
