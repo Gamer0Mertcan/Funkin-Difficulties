@@ -3,163 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FNF Extreme Mod List</title>
+    <title>Funkin Difficulties | FNF Skill Ranking</title>
     <style>
         :root {
-            --bg-color: #080808;
-            --card-bg: #121212;
-            --accent-color: #00e5ff; /* Cyan theme for a clean look */
-            --text-color: #e0e0e0;
-            --secondary-text: #888;
+            --bg: #050505;
+            --card: #111;
+            --fnf-pink: #ff1c9b;
+            --fnf-blue: #00ffff;
+            --text: #ffffff;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
-            line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
         }
 
+        /* Title Styling */
         header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
 
         h1 {
-            color: var(--accent-color);
-            font-size: 3.5rem;
+            font-size: 4rem;
             margin: 0;
-            letter-spacing: -2px;
             text-transform: uppercase;
+            font-style: italic;
+            background: linear-gradient(90deg, var(--fnf-pink), var(--fnf-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 3px 3px 0px rgba(255, 255, 255, 0.1);
         }
 
-        /* Controls Section */
-        .controls {
+        .subtitle {
+            color: var(--fnf-blue);
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        /* UI Controls */
+        .ui-bar {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 30px;
-            position: sticky;
-            top: 20px;
-            z-index: 10;
         }
 
-        #searchBar {
+        #search {
             flex-grow: 1;
             padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: var(--card-bg);
+            background: var(--card);
+            border: 2px solid #222;
+            border-radius: 4px;
             color: white;
-            font-size: 1rem;
+            outline: none;
         }
+
+        #search:focus { border-color: var(--fnf-pink); }
 
         .btn {
             padding: 15px 25px;
-            border-radius: 8px;
-            border: none;
-            font-weight: bold;
             cursor: pointer;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .btn-submit { background: var(--fnf-pink); color: white; }
+        .btn-submit:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--fnf-pink); }
+
+        /* Song List */
+        .list-wrapper { display: flex; flex-direction: column; gap: 15px; }
+
+        .song-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            border-right: 4px solid var(--fnf-blue);
             transition: 0.3s;
         }
 
-        .btn-submit {
-            background: var(--accent-color);
-            color: #000;
-        }
+        .song-card:hover { background: #181818; }
 
-        .btn-submit:hover {
-            filter: brightness(1.2);
-            box-shadow: 0 0 15px var(--accent-color);
-        }
-
-        /* Mod List */
-        .mod-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .mod-card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #222;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .mod-card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-2px);
-        }
-
-        .rank {
+        .rank-num {
             font-size: 2.5rem;
             font-weight: 900;
-            color: #333;
-            margin-right: 25px;
-            min-width: 60px;
+            width: 80px;
+            color: #222;
+            font-style: italic;
         }
 
-        .mod-details h3 {
-            margin: 0;
-            font-size: 1.6rem;
-        }
-
-        .links {
-            margin-top: 8px;
-        }
-
-        .links a {
-            color: var(--secondary-text);
+        .song-info { flex-grow: 1; }
+        .song-info h3 { margin: 0; font-size: 1.5rem; color: var(--fnf-blue); }
+        
+        .meta-links { margin-top: 10px; }
+        .meta-links a {
+            color: #888;
             text-decoration: none;
-            margin-right: 15px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-right: 20px;
+            font-size: 0.8rem;
+            border-bottom: 1px solid transparent;
         }
+        .meta-links a:hover { color: white; border-bottom: 1px solid var(--fnf-pink); }
 
-        .links a:hover {
-            color: var(--accent-color);
-        }
-
-        /* Submit Modal */
-        .modal {
+        /* Submission Panel */
+        .overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
         }
 
-        .modal-content {
+        .modal {
             background: #111;
-            width: 90%;
-            max-width: 450px;
+            width: 400px;
             margin: 100px auto;
-            padding: 40px;
-            border-radius: 15px;
-            border: 1px solid var(--accent-color);
+            padding: 30px;
+            border: 2px solid var(--fnf-pink);
+            border-radius: 10px;
         }
 
-        .modal-content input {
+        .modal input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
             background: #222;
-            border: 1px solid #444;
+            border: 1px solid #333;
             color: white;
-            border-radius: 5px;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -167,90 +150,72 @@
 
 <div class="container">
     <header>
-        <h1>FNF Demonlist</h1>
-        <p style="color: var(--secondary-text)">The definitive ranking of the hardest Friday Night Funkin' mods.</p>
+        <h1>FUNKIN DIFFICULTIES</h1>
+        <div class="subtitle">Official FNF Mod Ranking</div>
     </header>
 
-    <div class="controls">
-        <input type="text" id="searchBar" placeholder="Search for a song or mod..." onkeyup="filterList()">
-        <button class="btn btn-submit" onclick="toggleModal(true)">SUBMIT RECORD</button>
+    <div class="ui-bar">
+        <input type="text" id="search" placeholder="Filter songs..." onkeyup="search()">
+        <button class="btn btn-submit" onclick="openModal()">SUBMIT SCORE</button>
     </div>
 
-    <div id="listContainer" class="mod-list">
+    <div id="list" class="list-wrapper">
         </div>
 </div>
 
-<div id="submitModal" class="modal">
-    <div class="modal-content">
-        <h2 style="margin-top:0">Submit a Clear</h2>
-        <p style="font-size: 0.9rem; color: #888;">Provide proof of your achievement to be added to the victors list.</p>
-        
-        <input type="text" id="subMod" placeholder="Mod / Song Name">
-        <input type="text" id="subUser" placeholder="Discord Username (e.g. User#0000)">
-        <input type="text" id="subLink" placeholder="Proof Video Link (YouTube/Streamable)">
-        
-        <button class="btn btn-submit" style="width:100%; margin-top:20px;" onclick="handleSubmit()">SEND SUBMISSION</button>
-        <button class="btn" style="width:100%; background:none; color: #666;" onclick="toggleModal(false)">Cancel</button>
+<div id="modal" class="overlay">
+    <div class="modal">
+        <h2 style="color: var(--fnf-pink)">Submit Score</h2>
+        <input type="text" id="m_song" placeholder="Song/Mod Name">
+        <input type="text" id="m_user" placeholder="Discord Username">
+        <input type="text" id="m_vid" placeholder="Video Proof Link">
+        <button class="btn btn-submit" style="width:100%" onclick="closeModal()">Submit for Review</button>
+        <button class="btn" style="width:100%; background:none; color: gray;" onclick="closeModal()">Cancel</button>
     </div>
 </div>
 
 <script>
-    // Replace this with your actual GitHub Raw Link
-    const JSON_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/data.json';
-    let modData = [];
+    const API_URL = 'YOUR_RAW_GITHUB_LINK_HERE';
+    let songs = [];
 
-    async function fetchData() {
+    async function loadData() {
         try {
-            const response = await fetch(JSON_URL);
-            const data = await response.json();
-            modData = data.LISTE;
-            renderList(modData);
-        } catch (e) {
-            console.error("Error fetching data:", e);
-            document.getElementById('listContainer').innerHTML = "<p>Failed to load list. Check your JSON link.</p>";
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            songs = data.LISTE;
+            render(songs);
+        } catch (err) {
+            console.error("Link error:", err);
+            document.getElementById('list').innerHTML = "Link data.json correctly.";
         }
     }
 
-    function renderList(data) {
-        const container = document.getElementById('listContainer');
-        container.innerHTML = data.map((mod, index) => `
-            <div class="mod-card">
-                <div style="display:flex; align-items:center;">
-                    <div class="rank">#${index + 1}</div>
-                    <div class="mod-details">
-                        <h3>${mod.name}</h3>
-                        <div class="links">
-                            <a href="${mod.download}" target="_blank">📥 Download</a>
-                            <a href="${mod.verification}" target="_blank">🛡️ Verification</a>
-                        </div>
+    function render(arr) {
+        const list = document.getElementById('list');
+        list.innerHTML = arr.map((item, i) => `
+            <div class="song-card">
+                <div class="rank-num">#${i + 1}</div>
+                <div class="song-info">
+                    <h3>${item.name}</h3>
+                    <div class="meta-links">
+                        <a href="${item.download}" target="_blank">GET MOD</a>
+                        <a href="${item.verification}" target="_blank">VERIFICATION</a>
                     </div>
                 </div>
             </div>
         `).join('');
     }
 
-    function filterList() {
-        const query = document.getElementById('searchBar').value.toLowerCase();
-        const filtered = modData.filter(m => m.name.toLowerCase().includes(query));
-        renderList(filtered);
+    function search() {
+        const val = document.getElementById('search').value.toLowerCase();
+        const filtered = songs.filter(s => s.name.toLowerCase().includes(val));
+        render(filtered);
     }
 
-    function toggleModal(show) {
-        document.getElementById('submitModal').style.display = show ? 'block' : 'none';
-    }
+    function openModal() { document.getElementById('modal').style.display = 'block'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-    function handleSubmit() {
-        const user = document.getElementById('subUser').value;
-        const mod = document.getElementById('subMod').value;
-        if(user && mod) {
-            alert(`Thanks ${user}! Your submission for ${mod} has been received.`);
-            toggleModal(false);
-        } else {
-            alert("Please fill in the mod name and your username!");
-        }
-    }
-
-    fetchData();
+    loadData();
 </script>
 
 </body>
