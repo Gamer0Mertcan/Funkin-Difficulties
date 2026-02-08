@@ -23,7 +23,7 @@
             padding: 20px;
         }
 
-        .container { max-width: 800px; margin: 40px auto; }
+        .container { max-width: 900px; margin: 40px auto; }
 
         header { text-align: center; margin-bottom: 50px; }
         h1 {
@@ -48,39 +48,64 @@
         }
         .btn-pink { background: var(--fnf-pink); color: white; }
 
-        /* List Items */
+        /* Song Cards */
         .song-card {
             background: var(--card);
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             margin-bottom: 15px;
             border-left: 5px solid var(--fnf-pink);
+            display: flex;
+            flex-direction: column;
         }
 
-        .rank-num { font-size: 2.5rem; font-weight: 900; color: #222; margin-right: 20px; font-style: italic; }
-        .song-title { margin: 0; font-size: 1.5rem; color: var(--fnf-blue); }
+        .card-main { display: flex; align-items: flex-start; gap: 20px; }
+
+        .rank-num { 
+            font-size: 2.5rem; 
+            font-weight: 900; 
+            color: #1a1a1a; 
+            font-style: italic;
+            min-width: 60px;
+        }
+
+        /* Icon Styling */
+        .icon-container {
+            display: flex;
+            gap: 5px;
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .char-icon {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            image-rendering: pixelated; /* Keeps FNF icons sharp */
+        }
+
+        .song-info { flex-grow: 1; }
+        .song-title { margin: 0; font-size: 1.8rem; color: var(--fnf-blue); }
         
-        .links-row { margin-top: 10px; display: flex; gap: 20px; align-items: center; }
+        .links-row { margin-top: 15px; display: flex; gap: 20px; align-items: center; }
         .links-row a, .toggle-vid {
             color: var(--sub-text); text-decoration: none;
-            font-size: 0.8rem; font-weight: bold; background: none; border: none; cursor: pointer;
+            font-size: 0.85rem; font-weight: bold; background: none; border: none; cursor: pointer;
         }
         .links-row a:hover, .toggle-vid:hover { color: white; }
 
         .status-badge {
             font-size: 0.7rem; color: var(--status-yellow);
             border: 1px solid var(--status-yellow);
-            padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
+            padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
         }
 
-        /* Video wrapper */
         .video-wrapper {
             display: none; margin-top: 20px; position: relative;
             padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px;
         }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* Modal */
         .overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 1000;
@@ -99,7 +124,7 @@
     </header>
 
     <div class="controls">
-        <input type="text" id="searchBar" placeholder="Search mods..." onkeyup="search()">
+        <input type="text" id="searchBar" placeholder="Search mods or characters..." onkeyup="search()">
         <button class="btn btn-pink" onclick="modal(true)">Submit</button>
     </div>
 
@@ -109,7 +134,7 @@
 <div id="modalOverlay" class="overlay">
     <div class="modal">
         <h2 style="color:var(--fnf-pink)">Submit Record</h2>
-        <input type="text" id="m_song" placeholder="Song Name" style="width:100%; margin-bottom:10px; padding:10px;">
+        <input type="text" id="m_song" placeholder="Song Name" style="width:100%; margin-bottom:10px; padding:10px; background:#222; color:white; border:1px solid #444;">
         <button class="btn btn-pink" style="width:100%" onclick="modal(false)">Send</button>
         <button class="btn" style="width:100%; background:none; color:gray;" onclick="modal(false)">Cancel</button>
     </div>
@@ -141,18 +166,28 @@
             const ytId = getYTID(item.verification);
             const hasDownload = item.download && item.download.trim() !== "";
             const hasVerify = item.verification && item.verification.trim() !== "";
+            
+            // Icon Logic: Handle single string or array
+            let iconHtml = '';
+            if (item.icon) {
+                const icons = Array.isArray(item.icon) ? item.icon : [item.icon];
+                iconHtml = icons.map(src => `<img src="./icons/${src}" class="char-icon" alt="icon">`).join('');
+            }
 
             return `
                 <div class="song-card">
-                    <div style="display:flex; align-items:center;">
+                    <div class="card-main">
                         <span class="rank-num">#${i + 1}</span>
-                        <div style="flex-grow:1">
+                        <div class="icon-container">
+                            ${iconHtml}
+                        </div>
+                        <div class="song-info">
                             <h3 class="song-title">${item.name}</h3>
                             <div class="links-row">
                                 ${hasDownload ? `<a href="${item.download}" target="_blank">DOWNLOAD</a>` : '<span class="status-badge">Private / Closed</span>'}
                                 
                                 ${hasVerify ? 
-                                    (ytId ? `<button class="toggle-vid" onclick="toggleVid('vid-${i}')">WATCH PROOF</button>` : `<a href="${item.verification}" target="_blank">VIEW PROOF</a>`) 
+                                    (ytId ? `<button class="toggle-vid" onclick="toggleVid('vid-${i}')">VERIFICATION</button>` : `<a href="${item.verification}" target="_blank">VERIFICATION</a>`) 
                                     : '<span class="status-badge" style="color:var(--fnf-pink); border-color:var(--fnf-pink);">Verification Pending</span>'
                                 }
                             </div>
