@@ -12,7 +12,6 @@
             --fnf-blue: #00ffff;
             --text: #ffffff;
             --sub-text: #666;
-            --status-yellow: #ffcc00;
         }
 
         body {
@@ -39,55 +38,43 @@
         .controls { display: flex; gap: 10px; margin-bottom: 30px; }
         #searchBar {
             flex-grow: 1; padding: 15px; background: var(--card);
-            border: 2px solid #222; border-radius: 8px; color: white;
+            border: 2px solid #222; border-radius: 8px; color: white; outline: none;
         }
+        #searchBar:focus { border-color: var(--fnf-pink); }
 
-        .btn {
-            padding: 12px 20px; border: none; border-radius: 6px;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-pink { background: var(--fnf-pink); color: white; }
 
-        /* Song Cards */
+        /* Card Layout */
         .song-card {
             background: var(--card);
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 15px;
             border-left: 5px solid var(--fnf-pink);
-            display: flex;
-            flex-direction: column;
         }
 
-        .card-main { display: flex; align-items: flex-start; gap: 20px; }
+        .card-main { display: flex; align-items: center; gap: 20px; }
 
         .rank-num { 
-            font-size: 2.5rem; 
-            font-weight: 900; 
-            color: #1a1a1a; 
-            font-style: italic;
-            min-width: 60px;
+            font-size: 2.5rem; font-weight: 900; color: #1a1a1a; 
+            font-style: italic; min-width: 60px;
         }
 
-        /* Icon Styling */
-        .icon-container {
-            display: flex;
-            gap: 5px;
-            min-width: 150px;
-            justify-content: center;
-        }
-
+        /* Icon logic */
+        .icon-container { display: flex; gap: -20px; } /* Slight overlap like FNF icons */
+        
         .char-icon {
-            width: 150px;
-            height: 150px;
+            width: 100px;
+            height: 100px;
             object-fit: contain;
-            image-rendering: pixelated; /* Keeps FNF icons sharp */
+            image-rendering: pixelated; /* Essential for FNF icons */
         }
 
         .song-info { flex-grow: 1; }
         .song-title { margin: 0; font-size: 1.8rem; color: var(--fnf-blue); }
         
-        .links-row { margin-top: 15px; display: flex; gap: 20px; align-items: center; }
+        .links-row { margin-top: 10px; display: flex; gap: 15px; align-items: center; }
         .links-row a, .toggle-vid {
             color: var(--sub-text); text-decoration: none;
             font-size: 0.85rem; font-weight: bold; background: none; border: none; cursor: pointer;
@@ -95,8 +82,7 @@
         .links-row a:hover, .toggle-vid:hover { color: white; }
 
         .status-badge {
-            font-size: 0.7rem; color: var(--status-yellow);
-            border: 1px solid var(--status-yellow);
+            font-size: 0.7rem; color: #ffcc00; border: 1px solid #ffcc00;
             padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
         }
 
@@ -106,6 +92,7 @@
         }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
+        /* Modal */
         .overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 1000;
@@ -124,7 +111,7 @@
     </header>
 
     <div class="controls">
-        <input type="text" id="searchBar" placeholder="Search mods or characters..." onkeyup="search()">
+        <input type="text" id="searchBar" placeholder="Search..." onkeyup="search()">
         <button class="btn btn-pink" onclick="modal(true)">Submit</button>
     </div>
 
@@ -141,16 +128,18 @@
 </div>
 
 <script>
-    const RAW_URL = 'https://raw.githubusercontent.com/Gamer0Mertcan/Funkin-Difficulties/main/data.json';
-    const API_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(RAW_URL);
+    // Since this is the same repo, we fetch the local file
+    const DATA_PATH = './data.json'; 
     let songs = [];
 
     async function init() {
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(DATA_PATH);
             songs = await response.json();
             render(songs);
-        } catch (e) { console.error(e); }
+        } catch (e) {
+            console.error("Local data.json not found", e);
+        }
     }
 
     function getYTID(url) {
@@ -164,40 +153,31 @@
         const listContainer = document.getElementById('list');
         listContainer.innerHTML = data.map((item, i) => {
             const ytId = getYTID(item.verification);
-            const hasDownload = item.download && item.download.trim() !== "";
-            const hasVerify = item.verification && item.verification.trim() !== "";
             
-            // Icon Logic: Handle single string or array
+            // Icon Logic - Adjusted for local folder structure
             let iconHtml = '';
             if (item.icon) {
                 const icons = Array.isArray(item.icon) ? item.icon : [item.icon];
-                iconHtml = icons.map(src => `<img src="./icons/${src}.png" class="char-icon" alt="icon">`).join('');
+                iconHtml = icons.map(name => `<img src="icons/${name}.png" class="char-icon" onerror="this.style.display='none'">`).join('');
             }
 
             return `
                 <div class="song-card">
                     <div class="card-main">
                         <span class="rank-num">#${i + 1}</span>
-                        <div class="icon-container">
-                            ${iconHtml}
-                        </div>
+                        <div class="icon-container">${iconHtml}</div>
                         <div class="song-info">
                             <h3 class="song-title">${item.name}</h3>
                             <div class="links-row">
-                                ${hasDownload ? `<a href="${item.download}" target="_blank">DOWNLOAD</a>` : '<span class="status-badge">Private / Closed</span>'}
-                                
-                                ${hasVerify ? 
+                                ${item.download ? `<a href="${item.download}" target="_blank">DOWNLOAD</a>` : '<span class="status-badge">Private</span>'}
+                                ${item.verification ? 
                                     (ytId ? `<button class="toggle-vid" onclick="toggleVid('vid-${i}')">VERIFICATION</button>` : `<a href="${item.verification}" target="_blank">VERIFICATION</a>`) 
-                                    : '<span class="status-badge" style="color:var(--fnf-pink); border-color:var(--fnf-pink);">Verification Pending</span>'
+                                    : '<span class="status-badge" style="color:var(--fnf-pink); border-color:var(--fnf-pink);">Pending</span>'
                                 }
                             </div>
                         </div>
                     </div>
-                    ${ytId ? `
-                        <div id="vid-${i}" class="video-wrapper">
-                            <iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe>
-                        </div>
-                    ` : ''}
+                    ${ytId ? `<div id="vid-${i}" class="video-wrapper"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe></div>` : ''}
                 </div>
             `;
         }).join('');
@@ -214,9 +194,4 @@
         render(filtered);
     }
 
-    function modal(show) { document.getElementById('modalOverlay').style.display = show ? 'block' : 'none'; }
-
-    init();
-</script>
-</body>
-</html>
+    function modal(show) { document.getElementById('modalOverlay').style.
