@@ -171,7 +171,7 @@
             let iconHtml = '';
             if (item.icon) {
                 const icons = Array.isArray(item.icon) ? item.icon : [item.icon];
-                iconHtml = icons.map(src => `<img src="./icons/${src}" class="char-icon" alt="icon">`).join('');
+                iconHtml = icons.map(src => `<img src="./icons/${src}.png" class="char-icon" alt="icon">`).join('');
             }
 
             return `
