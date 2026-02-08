@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNF Extreme Mod List</title>
+    <style>
+        :root {
+            --bg-color: #080808;
+            --card-bg: #121212;
+            --accent-color: #00e5ff; /* Cyan theme for a clean look */
+            --text-color: #e0e0e0;
+            --secondary-text: #888;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 3.5rem;
+            margin: 0;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        /* Controls Section */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 10;
+        }
+
+        #searchBar {
+            flex-grow: 1;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: var(--card-bg);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .btn-submit:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        /* Mod List */
+        .mod-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mod-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #222;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .mod-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .rank {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #333;
+            margin-right: 25px;
+            min-width: 60px;
+        }
+
+        .mod-details h3 {
+            margin: 0;
+            font-size: 1.6rem;
+        }
+
+        .links {
+            margin-top: 8px;
+        }
+
+        .links a {
+            color: var(--secondary-text);
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Submit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #111;
+            width: 90%;
+            max-width: 450px;
+            margin: 100px auto;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid var(--accent-color);
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>FNF Demonlist</h1>
+        <p style="color: var(--secondary-text)">The definitive ranking of the hardest Friday Night Funkin' mods.</p>
+    </header>
+
+    <div class="controls">
+        <input type="text" id="searchBar" placeholder="Search for a song or mod..." onkeyup="filterList()">
+        <button class="btn btn-submit" onclick="toggleModal(true)">SUBMIT RECORD</button>
+    </div>
+
+    <div id="listContainer" class="mod-list">
+        </div>
+</div>
+
+<div id="submitModal" class="modal">
+    <div class="modal-content">
+        <h2 style="margin-top:0">Submit a Clear</h2>
+        <p style="font-size: 0.9rem; color: #888;">Provide proof of your achievement to be added to the victors list.</p>
+        
+        <input type="text" id="subMod" placeholder="Mod / Song Name">
+        <input type="text" id="subUser" placeholder="Discord Username (e.g. User#0000)">
+        <input type="text" id="subLink" placeholder="Proof Video Link (YouTube/Streamable)">
+        
+        <button class="btn btn-submit" style="width:100%; margin-top:20px;" onclick="handleSubmit()">SEND SUBMISSION</button>
+        <button class="btn" style="width:100%; background:none; color: #666;" onclick="toggleModal(false)">Cancel</button>
+    </div>
+</div>
+
+<script>
+    // Replace this with your actual GitHub Raw Link
+    const JSON_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/data.json';
+    let modData = [];
+
+    async function fetchData() {
+        try {
+            const response = await fetch(JSON_URL);
+            const data = await response.json();
+            modData = data.LISTE;
+            renderList(modData);
+        } catch (e) {
+            console.error("Error fetching data:", e);
+            document.getElementById('listContainer').innerHTML = "<p>Failed to load list. Check your JSON link.</p>";
+        }
+    }
+
+    function renderList(data) {
+        const container = document.getElementById('listContainer');
+        container.innerHTML = data.map((mod, index) => `
+            <div class="mod-card">
+                <div style="display:flex; align-items:center;">
+                    <div class="rank">#${index + 1}</div>
+                    <div class="mod-details">
+                        <h3>${mod.name}</h3>
+                        <div class="links">
+                            <a href="${mod.download}" target="_blank">📥 Download</a>
+                            <a href="${mod.verification}" target="_blank">🛡️ Verification</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterList() {
+        const query = document.getElementById('searchBar').value.toLowerCase();
+        const filtered = modData.filter(m => m.name.toLowerCase().includes(query));
+        renderList(filtered);
+    }
+
+    function toggleModal(show) {
+        document.getElementById('submitModal').style.display = show ? 'block' : 'none';
+    }
+
+    function handleSubmit() {
+        const user = document.getElementById('subUser').value;
+        const mod = document.getElementById('subMod').value;
+        if(user && mod) {
+            alert(`Thanks ${user}! Your submission for ${mod} has been received.`);
+            toggleModal(false);
+        } else {
+            alert("Please fill in the mod name and your username!");
+        }
+    }
+
+    fetchData();
+</script>
+
+</body>
+</html>
